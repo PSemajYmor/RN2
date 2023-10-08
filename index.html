@@ -10,15 +10,17 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.0.0/mqtt.min.js"></script>
     <script>
+        alert("1");
         const mqttBrokerUrl = 'wss://37d8c068ca3a4586ad32e8f66c1edefa.s1.eu.hivemq.cloud:8883'; // Replace with your MQTT broker URL
         const client = mqtt.connect(mqttBrokerUrl);
-
+        alert("2");
         document.getElementById('onButton').addEventListener('click', () => {
             client.publish('topic/switch', '1'); // Publish '1' when On button is clicked
         });
 
         document.getElementById('offButton').addEventListener('click', () => {
             client.publish('topic/switch', '0'); // Publish '0' when Off button is clicked
+        alert("3");
         });
     </script>
 </body>
