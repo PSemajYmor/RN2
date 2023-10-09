@@ -1,28 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>LED Control</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
 </head>
 <body>
-    <button id="onButton">Turn On</button>
-    <button id="offButton">Turn Off</button>
+    <h1>Control Feed via MQTT</h1>
+    <button id="onButton">On</button>
+    <button id="offButton">Off</button>
 
-    <script src="https://cdn.io.adafruit.com/mqtt-3.0.0.min.js"></script>
     <script>
-        const username = "P_Semaj_Ymor";
-        const aioKey = rnvar;
-        const feedName = "led-control";
+        const client = new Paho.MQTT.Client('io.adafruit.com', 8083, 'webpage-client');
 
-        const client = new MQTT.Client({ host: 'io.adafruit.com', port: 8883, username, password: aioKey });
+        client.onConnectionLost = (responseObject) => {
+            if (responseObject.errorCode !== 0) {
+                console.log(`Connection lost: ${responseObject.errorMessage}`);
+            }
+        };
 
-        client.connect();
-
-        document.getElementById("onButton").addEventListener("click", function() {
-            client.publish(`${username}/feeds/${feedName}`, 'On');
+        client.connect({
+            onSuccess: () => {
+                console.log('Connected to Adafruit IO MQTT');
+            }
         });
 
-        document.getElementById("offButton").addEventListener("click", function() {
-            client.publish(`${username}/feeds/${feedName}`, 'Off');
+        document.getElementById('onButton').addEventListener('click', () => {
+            client.publish('/P_Semaj_Ymor/feeds/bulb', '1');
+        });
+
+        document.getElementById('offButton').addEventListener('click', () => {
+            client.publish('/P_Semaj_Ymor/feeds/bulb', '0');
         });
     </script>
 </body>
