@@ -1,35 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
+    <title>Adafruit IO Control</title>
 </head>
 <body>
-    <h1>Control Feed via MQTT</h1>
     <button id="onButton">On</button>
     <button id="offButton">Off</button>
 
     <script>
-        const client = new Paho.MQTT.Client('io.adafruit.com', 8083, 'webpage-client');
-
-        client.onConnectionLost = (responseObject) => {
-            if (responseObject.errorCode !== 0) {
-                console.log(`Connection lost: ${responseObject.errorMessage}`);
-            }
-        };
-
-        client.connect({
-            onSuccess: () => {
-                console.log('Connected to Adafruit IO MQTT');
-            }
+        document.getElementById('onButton').addEventListener('click', function() {
+            sendDataToAdafruitIO(1); // Send '1' to indicate On
         });
 
-        document.getElementById('onButton').addEventListener('click', () => {
-            client.publish('/P_Semaj_Ymor/feeds/bulb', '1');
+        document.getElementById('offButton').addEventListener('click', function() {
+            sendDataToAdafruitIO(0); // Send '0' to indicate Off
         });
 
-        document.getElementById('offButton').addEventListener('click', () => {
-            client.publish('/P_Semaj_Ymor/feeds/bulb', '0');
-        });
+        function sendDataToAdafruitIO(value) {
+            const webhookURL = 'https://io.adafruit.com/api/v2/webhooks/feed/MLyPk5xNqT6RDkaSnWaNwcW8Dgoq';
+
+            // Create a JSON payload with the value
+            const data = JSON.stringify({
+                value: value
+            });
+
+            // Send a POST request to the webhook URL
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: data
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log(`Data sent successfully: ${value}`);
+                } else {
+                    console.error('Failed to send data to Adafruit IO');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
 </body>
 </html>
